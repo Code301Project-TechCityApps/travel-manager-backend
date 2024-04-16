@@ -5,8 +5,9 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const currencyRoutes = require('./routes/currencyRoutes');
-
+const translateRoutes = require('./routes/translateRoutes');
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
@@ -24,6 +25,7 @@ app.get('/test', (request, response) => {
 })
 
 app.use('/api/currency', currencyRoutes);
+app.use('/api/translate', translateRoutes);
 
 
 
