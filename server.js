@@ -12,6 +12,7 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
 
+
 mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -22,7 +23,7 @@ app.get('/test', (request, response) => {
   response.send('test request received')
 })
 
-app.use('/api', currencyRoutes);
+app.use('/api/currency', currencyRoutes);
 
 
 

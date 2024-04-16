@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { convertCurrency } = require('../services/currencyService');
+const { getLatestRates } = require('../services/currencyService');
+const { clearCurrencyConversions } = require('../services/currencyService');
 
+// Custom amount conversion rate
 router.post('/convert', async (req, res) => {
   try {
     const { from, to, amount } = req.query;
@@ -14,16 +17,43 @@ router.post('/convert', async (req, res) => {
   }
 });
 
+// Latest 1 to 1 conversion rate 
 router.get('/latest', async (req, res) => {
-    console.log('request.query', req.query);
-    try {
-      const { base, symbols } = req.query; // Expecting 'symbols' as a comma-separated string
-      const symbolArray = symbols.split(','); // Convert symbols string back to array
-      const result = await getLatestRates(base, symbolArray);
-      res.json(result);
-    } catch (error) {
-      res.status(500).json({ error: error.message });
+  try {
+    const { base } = req.query;
+    let { symbols } = req.query;
+
+    console.log('Received base', base);
+    console.log('Received symbols', symbols);
+
+
+    if (!symbols) {
+      symbols = "";
     }
-  });
+
+    const formattedSymbols = symbols.split(',')
+                                    .map(symbol => symbol.trim())
+                                    .join(',');
+    console.log('Formatted symbols:', formattedSymbols); 
+
+    const result = await getLatestRates(base, formattedSymbols);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+// Clear database manually
+router.delete('/clear-conversions', async (req, res) => {
+  try {
+    await clearCurrencyConversions();
+    res.status(200).send('All currency conversions have been successfully deleted.');
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;
   
 module.exports = router;
