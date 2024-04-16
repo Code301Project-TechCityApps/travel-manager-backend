@@ -1,49 +1,59 @@
-const axios = require('axios');
-const mongoose = require('mongoose');
-const { v4: uuidv4 } = require('uuid');
+const axios = require("axios");
+const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 // Set up MongoDB schema and model within the same service file
 const translationCacheSchema = new mongoose.Schema({
-    originalText: String,
-    translatedText: String,
-    fromLang: String,
-    toLang: String,
-    createdAt: { type: Date, default: Date.now, expires: '24h' }  // Documents will expire after 24 hours
+  originalText: String,
+  translatedText: String,
+  toLang: String,
+  createdAt: { type: Date, default: Date.now, expires: "24h" }, // Documents will expire after 24 hours
 });
 
-const TranslationCache = mongoose.model('TranslationCache', translationCacheSchema);
+const TranslationCache = mongoose.model(
+  "TranslationCache",
+  translationCacheSchema
+);
 
 const key = process.env.TRANSLATOR_KEY;
-const endpoint = 'https://api.cognitive.microsofttranslator.com';
-const location = 'centralus';
-
+const endpoint = "https://api.cognitive.microsofttranslator.com";
+const location = "centralus";
 
 //https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=es
-async function translateText(text, fromLang, toLang) {
+async function translateText(text, toLang) {
+  console.log("toLang ", toLang);
+  console.log("text ", text);
   // Check cache first
-  const cachedTranslation = await TranslationCache.findOne({ originalText: text, fromLang, toLang });
+  const cachedTranslation = await TranslationCache.findOne({
+    originalText: text,
+    toLang,
+  });
   if (cachedTranslation) {
-    return { translatedText: cachedTranslation.translatedText, fromCache: true };
+    return {
+      translatedText: cachedTranslation.translatedText,
+      fromCache: true,
+    };
   }
 
   // If not in cache, fetch from API
   try {
     const response = await axios({
       baseURL: endpoint,
-      url: '/translate',
-      method: 'post',
+      url: "/translate",
+      method: "post",
       headers: {
-        'Ocp-Apim-Subscription-Key': key,
-        'Ocp-Apim-Subscription-Region': location,
-        'Content-type': 'application/json'
+        "Ocp-Apim-Subscription-Key": key,
+        "Ocp-Apim-Subscription-Region": location,
+        "Content-type": "application/json",
+        // 'X-ClientTraceId': uuidv4().toString()
+
       },
       params: {
-        'api-version': '3.0',
-        'from': fromLang,
-        'to': toLang
+        "api-version": "3.0",
+        to: toLang,
       },
-      data: [{ 'text': text }],
-      responseType: 'json'
+      data: [{ text: text }],
+      responseType: "json",
     });
 
     const translatedText = response.data[0].translations[0].text;
@@ -51,13 +61,12 @@ async function translateText(text, fromLang, toLang) {
     await new TranslationCache({
       originalText: text,
       translatedText: translatedText,
-      fromLang: fromLang,
-      toLang: toLang
+      toLang: toLang,
     }).save();
 
     return { translatedText, fromCache: false };
   } catch (error) {
-    console.error('Translation error:', error);
+    console.error("Translation error:", error);
     throw error;
   }
 }
