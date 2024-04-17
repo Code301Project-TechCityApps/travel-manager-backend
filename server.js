@@ -20,11 +20,11 @@ mongoose.connect(process.env.MONGO_URL, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => console.log('MongoDB connected'))
-.catch(err => console.log('MongoDB connection error:', err));
+  .catch(err => console.log('MongoDB connection error:', err));
 
 app.get('/test', (request, response) => {
-  response.send('test request received')
-})
+  response.send('test request received');
+});
 
 app.use('/api/currency', currencyRoutes);
 app.use('/api/translate', translateRoutes);
