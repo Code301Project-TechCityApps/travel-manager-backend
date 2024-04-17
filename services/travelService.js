@@ -8,27 +8,30 @@ const TRANSPORTATION_KEY = process.env.TRANSPORTATION_KEY;
 
 const transportationSchema = new mongoose.Schema({
   name: String,
-  type: String,
-  location: String
+  time: String,
+  category: String
 });
 
 const Transportation = mongoose.model('Transportation', transportationSchema);
 
+//https://transit.hereapi.com/v8/departures?in=41.90123,12.50091&name=termini&apiKey=tmvCe75EErD9HjBIUgDRviLVEbjIGst7K7tqllPkc6Q
 // Function to fetch transportation data asynchronously
 const fetchTransportationData = async (lat, lng, name) => {
-  const response = await axios.get('https://transit.hereapi.com/v8/stations', {
+  const response = await axios.get('https://transit.hereapi.com/v8/departures', {
     params: {
       in: `${lat},${lng}`,
       name: name,
       apiKey: TRANSPORTATION_KEY
     }
   });
-  await Promise.all(response.data.stations.map(async station => {
+  console.log('response', response.data.boards[0].place.name);
+  await Promise.all(response.data.boards.map(async cityDeparture => {
     const newTransportation = new Transportation({
-      name: station.place.name,
-      type: station.place.type,
-      location: station.location
+      time: cityDeparture.departures[0].time,
+      name: cityDeparture.place.name,
+      category: cityDeparture.departures[0].transport.category
     });
+    console.log(newTransportation);
     await newTransportation.save();
     return newTransportation;
   }));
