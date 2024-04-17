@@ -6,7 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const currencyRoutes = require('./routes/currencyRoutes');
 const translateRoutes = require('./routes/translateRoutes');
-const travelRoutes = require('./travelRoutes');
+const travelRoutes = require('./routes/travelRoutes');
 
 const app = express();
 

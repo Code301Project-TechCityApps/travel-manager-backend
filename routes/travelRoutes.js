@@ -3,7 +3,7 @@
 
 const express = require('express');
 const router = express.Router();
-const transportationService = require('./services/travelService');
+const transportationService = require('../services/travelService');
 
 // Route to handle transportation data request
 router.get('/traveldata', async (req, res) => {
