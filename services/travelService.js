@@ -24,7 +24,7 @@ const fetchTransportationData = async (lat, lng, name) => {
       apiKey: TRANSPORTATION_KEY
     }
   });
-  console.log('response', response.data.boards[0].place.name);
+  // console.log('response', response.data.boards[0].place.name);
   await Promise.all(response.data.boards.map(async cityDeparture => {
     const newTransportation = new Transportation({
       time: cityDeparture.departures[0].time,
