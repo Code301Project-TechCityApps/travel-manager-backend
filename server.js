@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const currencyRoutes = require('./routes/currencyRoutes');
+const travelRoutes = require('./travelRoutes');
 
 const app = express();
 app.use(cors());
@@ -24,6 +25,8 @@ app.get('/test', (request, response) => {
 })
 
 app.use('/api/currency', currencyRoutes);
+
+app.use('/api/transportation', travelRoutes);
 
 
 
