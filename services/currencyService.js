@@ -67,7 +67,7 @@ async function clearCurrencyConversions() {
       throw error;  // Re-throw the error for further handling if needed
     }
   }
-  
+// exports
 module.exports = {
   convertCurrency,
   getLatestRates,
