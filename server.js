@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const currencyRoutes = require('./routes/currencyRoutes');
 const translateRoutes = require('./routes/translateRoutes');
 const travelRoutes = require('./routes/travelRoutes');
-
+const flightRoutes = require ('./routes/flightRoutes')
 const app = express();
 
 app.use(cors());
@@ -31,6 +31,6 @@ app.use('/api/translate', translateRoutes);
 
 app.use('/api/transportation', travelRoutes);
 
-
+app.use('/api/flightDetails', flightRoutes);
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
