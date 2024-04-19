@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-// const { submitFlightDetails } = require('../services/itineraryServices'); 
-const Flight = require("../model")
+const Flight = require("../model");  
+const { clearSavedFlightDetails } = require('../services/itineraryService');
 
 
 // Middleware for error handling
@@ -18,28 +18,49 @@ router.get('/', asyncMiddleware(async (req, res) => {
 
 // Add a new flight with validation and error handling
 router.post('/', asyncMiddleware(async (req, res) => {
-    console.log("hello")
-    const { airline,
-        flightNum,
-        departureAirport,
-        arrivalAirport, } = req.body;
+    console.log("Received:", req.body); 
+    const { airline, flightNumber, departureAirport, arrivalAirport, departureDate, returnDate } = req.body; 
 
-    if (!airline || !flightNum) {
-        return res.status(400).json({ message: 'Title and status are required' });
+    if (!airline || !flightNumber) {
+        return res.status(400).json({ message: 'Airline and flight number are required' });
     }
 
     const flight = new Flight({
         airline,
-        flightNum,
+        flightNumber, 
         departureAirport,
         arrivalAirport,
+        departureDate, 
+        returnDate
     });
 
     const newFlight = await flight.save();
     res.status(201).json(newFlight);
 }));
 
-// Get a specific book by ID with error handling
+// get all flights 
+router.get('/', asyncMiddleware(async (req, res) => {
+    const flights = await Flight.find();
+    res.status(201).json(flights);
+}));
 
+// Specific flight by ID
+router.get('/id', asyncMiddleware(async (req, res) =>  {
+    const flight = await Flight.findById(req.params.flightNumber);
+    if (!flight) {
+        return res.status(404).json({ message: 'Cannot find flight number, please try again' });
+    }
+    res.status(200).json(flight);
+}));
 
-module.exports = router
+router.post('/clear-flight-details', async (req, res) => {
+    try {
+      await clearSavedFlightDetails();
+      res.status(200).send('All flight details have been successfully deleted.');
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+// Export the router
+module.exports = router;
