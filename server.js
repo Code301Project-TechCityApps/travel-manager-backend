@@ -30,7 +30,7 @@ app.use('/api/currency', currencyRoutes);
 app.use('/api/translate', translateRoutes);
 
 app.use('/api/transportation', travelRoutes);
-
 app.use('/api/flightDetails', flightRoutes);
+
 
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
